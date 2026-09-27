@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import LoginPage from './pages/LoginPage';
+import WelcomeAnimation from './pages/WelcomeAnimation';
+
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import { NotificationProvider } from './context/NotificationContext';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
+
 
 // Pages
 import OverviewDashboard from './pages/OverviewDashboard';
@@ -104,12 +109,40 @@ function MainLayout() {
   );
 }
 
+function AuthenticatedApp() {
+  const { user } = useAuth();
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setShowWelcome(true);
+    }
+  }, [user]);
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  if (showWelcome) {
+    return (
+      <WelcomeAnimation
+        username={user.username}
+        onComplete={() => setShowWelcome(false)}
+      />
+    );
+  }
+
+  return <MainLayout />;
+}
+
 export default function App() {
   return (
-    <ThemeProvider>
-      <NotificationProvider>
-        <MainLayout />
-      </NotificationProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <NotificationProvider>
+          <AuthenticatedApp />
+        </NotificationProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

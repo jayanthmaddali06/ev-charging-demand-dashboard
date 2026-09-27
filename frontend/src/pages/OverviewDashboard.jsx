@@ -100,38 +100,34 @@ const OverviewDashboard = ({ setActivePage }) => {
           value={summary?.totalChargingSessions || 8354}
           unit="sessions"
           icon={Users}
-          trend="up"
-          trendValue="+12.4%"
+          factLabel="2025-01-01 to 2025-03-29"
           colorScheme="emerald"
           delay={0.05}
         />
         <KPICard
           title="Avg Demand"
-          value={summary?.averageChargingDemand || 52.12}
+          value={summary?.averageChargingDemand || 53.16}
           unit="kWh"
           icon={Zap}
-          trend="up"
-          trendValue="+4.2%"
+          factLabel="per charging session"
           colorScheme="cyan"
           delay={0.1}
         />
         <KPICard
           title="Avg Station Load"
-          value={summary?.averageStationLoad || 48.74}
+          value={summary?.averageStationLoad || 53.18}
           unit="%"
           icon={Activity}
-          trend="normal"
-          trendValue="Optimal"
+          factLabel="across 20 stations"
           colorScheme="indigo"
           delay={0.15}
         />
         <KPICard
           title="Avg Queue Length"
-          value={summary?.averageQueueLength || 2.45}
+          value={summary?.averageQueueLength || 4.59}
           unit="vehicles"
           icon={Clock}
-          trend="down"
-          trendValue="-0.3"
+          factLabel="per session"
           colorScheme="amber"
           delay={0.2}
         />
@@ -140,18 +136,16 @@ const OverviewDashboard = ({ setActivePage }) => {
           value={summary?.detectedAnomalies || 418}
           unit={`(${summary?.anomalyPercentage || 5.0}%)`}
           icon={AlertTriangle}
-          trend="normal"
-          trendValue="5.0% rate"
+          factLabel="Isolation Forest · 5.0% rate"
           colorScheme="rose"
           delay={0.25}
         />
         <KPICard
-          title="Renewable Ratio"
-          value={summary?.renewableEnergyPercent || 49.3}
+          title="Avg Renewable Ratio"
+          value={summary?.renewableEnergyPercent || 35.4}
           unit="%"
           icon={Leaf}
-          trend="up"
-          trendValue="+8.1%"
+          factLabel="of energy mix"
           colorScheme="violet"
           delay={0.3}
         />
