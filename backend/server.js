@@ -1,46 +1,85 @@
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
 require('dotenv').config();
+
+
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const apiRoutes = require('./routes/api');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ──────────────────────────────────────────────────────────────────────────────
+// MongoDB Connection
+// ──────────────────────────────────────────────────────────────────────────────
+if (!process.env.MONGODB_URI) {
+  console.error('[DB] FATAL: MONGODB_URI is not set in environment variables.');
+  process.exit(1);
+}
+
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log('[DB] MongoDB connected successfully.'))
+  .catch((err) => {
+    console.error('[DB] MongoDB connection failed:', err.message);
+    process.exit(1);
+  });
+
+// ──────────────────────────────────────────────────────────────────────────────
 // Middleware
+// ──────────────────────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: '*',
+  origin: process.env.FRONTEND_URL || '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json());
+app.use(express.json({ limit: '10kb' })); // Limit payload size
 
 // Request logging in development
 app.use((req, res, next) => {
   const start = Date.now();
   res.on('finish', () => {
     const duration = Date.now() - start;
-    console.log(`[HTTP] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+    if (process.env.NODE_ENV !== 'test') {
+      console.log(`[HTTP] ${req.method} ${req.originalUrl} - ${res.statusCode} (${duration}ms)`);
+    }
   });
   next();
 });
 
-// API Routes
+// ──────────────────────────────────────────────────────────────────────────────
+// Routes
+// ──────────────────────────────────────────────────────────────────────────────
+
+// Authentication routes (public)
+app.use('/api/auth', authRoutes);
+
+// Analytics / ML API routes (public analytics; prediction is unguarded for now
+// since the ML service itself has no user-specific data)
 app.use('/api', apiRoutes);
 
 // Root route
 app.get('/', (req, res) => {
   res.json({
-    name: "EV Charging Demand Prediction & Smart Charging Analytics API",
-    status: "online",
+    name: 'EV Charging Demand Prediction & Smart Charging Analytics API',
+    status: 'online',
     endpoints: [
-      "/api/health",
-      "/api/summary",
-      "/api/time-series",
-      "/api/clusters",
-      "/api/anomalies",
-      "/api/model-evaluation",
-      "/api/predictions",
-      "/api/predict"
+      '/api/auth/register',
+      '/api/auth/login',
+      '/api/auth/me',
+      '/api/auth/logout',
+      '/api/health',
+      '/api/summary',
+      '/api/time-series',
+      '/api/clusters',
+      '/api/anomalies',
+      '/api/model-evaluation',
+      '/api/predictions',
+      '/api/predict',
     ]
   });
 });
@@ -60,9 +99,13 @@ app.use((err, req, res, next) => {
   });
 });
 
+// ──────────────────────────────────────────────────────────────────────────────
+// Start
+// ──────────────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`====================================================`);
   console.log(`🚀 EV Charging Node.js Backend listening on port ${PORT}`);
   console.log(`📡 ML Service configured at: ${process.env.ML_SERVICE_URL || 'http://localhost:8000'}`);
+  console.log(`🗄️  MongoDB: ${process.env.MONGODB_URI ? 'URI loaded' : 'NOT SET'}`);
   console.log(`====================================================`);
 });

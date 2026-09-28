@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-const KPICard = ({ title, value, unit = '', icon: Icon, trend, trendValue, colorScheme = 'emerald', delay = 0 }) => {
+const KPICard = ({ title, value, unit = '', icon: Icon, trend, trendValue, factLabel, colorScheme = 'emerald', delay = 0 }) => {
   const [displayValue, setDisplayValue] = useState(0);
 
   // Animated counter effect
@@ -110,18 +110,25 @@ const KPICard = ({ title, value, unit = '', icon: Icon, trend, trendValue, color
         </div>
       </div>
 
-      {(trend || trendValue) && (
+      {/* factLabel: shows a neutral factual note (no trend arrow) */}
+      {factLabel && (
+        <div className="mt-4 relative z-10">
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{factLabel}</span>
+        </div>
+      )}
+
+      {/* trend + trendValue: shows a colored badge (only when factLabel is not set) */}
+      {!factLabel && (trend || trendValue) && (
         <div className="mt-4 flex items-center gap-1.5 text-xs font-medium relative z-10">
           <span className={`inline-flex items-center px-1.5 py-0.5 rounded-md ${
-            trend === 'up' 
-              ? 'text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-400' 
+            trend === 'up'
+              ? 'text-emerald-700 bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-400'
               : trend === 'down'
               ? 'text-rose-700 bg-rose-100 dark:bg-rose-950/60 dark:text-rose-400'
               : 'text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400'
           }`}>
             {trendValue}
           </span>
-          <span className="text-slate-500 dark:text-slate-400 text-[11px]">vs baseline</span>
         </div>
       )}
     </motion.div>

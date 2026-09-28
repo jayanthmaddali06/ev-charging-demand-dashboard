@@ -37,6 +37,14 @@ frontend/dist/
 Thumbs.db
 Desktop.ini
 
-# Environment variables
+# Environment variables — never commit secrets
+.env
 .env.local
+.env.production
+.env.development
 backend/.env
+frontend/.env
+frontend/.env.local
+ml-service/.env
+backend/.env
+backend/.env.bak

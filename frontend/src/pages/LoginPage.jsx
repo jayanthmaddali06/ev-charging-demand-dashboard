@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, BatteryCharging, Zap, AlertCircle, CheckCircle2, Shield } from 'lucide-react';
+import { Eye, EyeOff, BatteryCharging, Zap, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-const LoginPage = ({ onLoginSuccess }) => {
+const LoginPage = ({ onLoginSuccess, onGoToSignUp }) => {
   const { login, isLoggingIn, loginError, clearLoginError, getRememberedUsername } = useAuth();
 
-  const [username, setUsername] = useState('');
+  const [identifier, setIdentifier] = useState(''); // username or email
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -17,16 +17,15 @@ const LoginPage = ({ onLoginSuccess }) => {
     setMounted(true);
     const remembered = getRememberedUsername();
     if (remembered) {
-      setUsername(remembered);
+      setIdentifier(remembered);
       setRememberMe(true);
     }
   }, [getRememberedUsername]);
 
   const validate = () => {
     const errs = {};
-    if (!username.trim()) errs.username = 'Username is required.';
+    if (!identifier.trim()) errs.identifier = 'Username or email is required.';
     if (!password) errs.password = 'Password is required.';
-    else if (password.length < 3) errs.password = 'Password too short.';
     return errs;
   };
 
@@ -36,8 +35,8 @@ const LoginPage = ({ onLoginSuccess }) => {
     const errs = validate();
     if (Object.keys(errs).length > 0) { setFieldErrors(errs); return; }
     setFieldErrors({});
-    const result = await login(username, password, rememberMe);
-    if (result.success) onLoginSuccess();
+    const result = await login(identifier.trim(), password, rememberMe);
+    if (result.success && onLoginSuccess) onLoginSuccess();
   };
 
   return (
@@ -57,10 +56,7 @@ const LoginPage = ({ onLoginSuccess }) => {
           <motion.div
             key={i}
             className="absolute w-1.5 h-1.5 rounded-full bg-emerald-400/40"
-            style={{
-              left: `${15 + i * 14}%`,
-              top: `${20 + (i % 3) * 25}%`,
-            }}
+            style={{ left: `${15 + i * 14}%`, top: `${20 + (i % 3) * 25}%` }}
             animate={{ y: [0, -20, 0], opacity: [0.3, 0.7, 0.3] }}
             transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.4 }}
           />
@@ -94,7 +90,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                 <h1 className="text-2xl font-extrabold text-white tracking-tight">
                   VoltPulse<span className="text-emerald-400">ML</span>
                 </h1>
-                <p className="text-slate-400 text-sm mt-1">EV Charging Demand Prediction & Analytics</p>
+                <p className="text-slate-400 text-sm mt-1">EV Charging Demand Prediction &amp; Analytics</p>
               </motion.div>
             </div>
 
@@ -106,40 +102,31 @@ const LoginPage = ({ onLoginSuccess }) => {
               className="bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-700/60 p-7 sm:p-9 shadow-2xl"
             >
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-white">Sign in</h2>
+                <h2 className="text-xl font-bold text-white">Sign In</h2>
                 <p className="text-slate-400 text-sm mt-1">Access your analytics dashboard</p>
               </div>
 
-              {/* Demo credentials notice */}
-              <div className="mb-5 flex items-start gap-2.5 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300">
-                <Shield className="w-4 h-4 flex-shrink-0 mt-0.5 text-emerald-400" />
-                <div>
-                  <span className="font-semibold text-emerald-400">Demo credentials:</span>
-                  <span className="ml-1 text-emerald-300/80">Username: <code className="font-mono bg-emerald-500/10 px-1 rounded">Jayanth</code> · Password: <code className="font-mono bg-emerald-500/10 px-1 rounded">ev@2025</code></span>
-                </div>
-              </div>
-
               <form onSubmit={handleSubmit} noValidate className="space-y-5">
-                {/* Username */}
+                {/* Username or Email */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">
-                    Username
+                    Username or Email
                   </label>
                   <input
                     type="text"
-                    value={username}
-                    onChange={e => { setUsername(e.target.value); setFieldErrors(p => ({ ...p, username: '' })); }}
-                    placeholder="Enter your username"
+                    value={identifier}
+                    onChange={e => { setIdentifier(e.target.value); setFieldErrors(p => ({ ...p, identifier: '' })); }}
+                    placeholder="Enter username or email"
                     autoComplete="username"
                     className={`w-full px-4 py-3 rounded-xl bg-slate-800/80 text-white placeholder-slate-500 border text-sm focus:outline-none focus:ring-2 transition-all ${
-                      fieldErrors.username
+                      fieldErrors.identifier
                         ? 'border-rose-500 focus:ring-rose-500/30'
                         : 'border-slate-700 focus:ring-emerald-500/40 focus:border-emerald-500/60'
                     }`}
                   />
-                  {fieldErrors.username && (
+                  {fieldErrors.identifier && (
                     <p className="mt-1.5 text-xs text-rose-400 flex items-center gap-1">
-                      <AlertCircle className="w-3.5 h-3.5" /> {fieldErrors.username}
+                      <AlertCircle className="w-3.5 h-3.5" /> {fieldErrors.identifier}
                     </p>
                   )}
                 </div>
@@ -192,7 +179,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                   </label>
                 </div>
 
-                {/* Server / credentials error */}
+                {/* API / credentials error */}
                 <AnimatePresence>
                   {loginError && (
                     <motion.div
@@ -207,7 +194,7 @@ const LoginPage = ({ onLoginSuccess }) => {
                   )}
                 </AnimatePresence>
 
-                {/* Submit button */}
+                {/* Submit */}
                 <button
                   type="submit"
                   disabled={isLoggingIn}
@@ -228,10 +215,21 @@ const LoginPage = ({ onLoginSuccess }) => {
                     </>
                   )}
                 </button>
+
+                {/* Sign Up link */}
+                <p className="text-center text-xs text-slate-500 pt-1">
+                  Don't have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={onGoToSignUp}
+                    className="text-emerald-400 hover:text-emerald-300 font-semibold transition-colors"
+                  >
+                    Create Account
+                  </button>
+                </p>
               </form>
             </motion.div>
 
-            {/* Footer note */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

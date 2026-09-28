@@ -12,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   BatteryCharging,
-  Sparkles
+  Sparkles,
+  UserCircle
 } from 'lucide-react';
 
 const navItems = [
@@ -23,6 +24,7 @@ const navItems = [
   { id: 'anomalies', label: 'Anomaly Detection', icon: AlertTriangle, badge: 'Isolation' },
   { id: 'performance', label: 'Model Performance', icon: Cpu, badge: 'R² 0.98' },
   { id: 'results', label: 'Prediction Results', icon: Table2, badge: null },
+  { id: 'profile', label: 'My Profile', icon: UserCircle, badge: null },
   { id: 'about', label: 'About Project', icon: Info, badge: null },
 ];
 
