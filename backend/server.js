@@ -9,6 +9,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const apiRoutes = require('./routes/api');
 const authRoutes = require('./routes/auth');
+const liveIntelligenceRoutes = require('./routes/liveIntelligenceRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -57,10 +59,11 @@ app.use((req, res, next) => {
 
 // Authentication routes (public)
 app.use('/api/auth', authRoutes);
-
+app.use('/api/live-intelligence', liveIntelligenceRoutes);
+app.use('/api', apiRoutes);
 // Analytics / ML API routes (public analytics; prediction is unguarded for now
 // since the ML service itself has no user-specific data)
-app.use('/api', apiRoutes);
+app.use('/api/ai', aiRoutes);
 
 // Root route
 app.get('/', (req, res) => {

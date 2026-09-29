@@ -14,6 +14,8 @@ import ClusterAnalysis from './pages/ClusterAnalysis';
 import AnomalyDetection from './pages/AnomalyDetection';
 import ModelPerformance from './pages/ModelPerformance';
 import PredictionResults from './pages/PredictionResults';
+import AIIntelligence from './pages/AIIntelligence';
+import LiveIntelligence from './pages/LiveIntelligence';
 import AboutProject from './pages/AboutProject';
 import UserProfile from './pages/UserProfile';
 import LoginPage from './pages/LoginPage';
@@ -40,6 +42,8 @@ function MainLayout({ activePage, setActivePage }) {
       case 'anomalies':    return <AnomalyDetection />;
       case 'performance':  return <ModelPerformance />;
       case 'results':      return <PredictionResults />;
+      case 'ai-intelligence':    return <AIIntelligence />;
+      case 'live-intelligence':  return <LiveIntelligence />;
       case 'profile':      return <UserProfile setActivePage={setActivePage} />;
       case 'about':        return <AboutProject />;
       default:             return <OverviewDashboard setActivePage={setActivePage} />;

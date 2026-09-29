@@ -13,7 +13,8 @@ import {
   ChevronRight,
   BatteryCharging,
   Sparkles,
-  UserCircle
+  UserCircle,
+  MapPinned
 } from 'lucide-react';
 
 const navItems = [
@@ -24,6 +25,8 @@ const navItems = [
   { id: 'anomalies', label: 'Anomaly Detection', icon: AlertTriangle, badge: 'Isolation' },
   { id: 'performance', label: 'Model Performance', icon: Cpu, badge: 'R² 0.98' },
   { id: 'results', label: 'Prediction Results', icon: Table2, badge: null },
+   { id: 'ai-intelligence', label: 'AI Intelligence', icon: Sparkles, badge: 'AI' },
+  { id: 'live-intelligence', label: 'Live Intelligence', icon: MapPinned, badge: 'Live' },
   { id: 'profile', label: 'My Profile', icon: UserCircle, badge: null },
   { id: 'about', label: 'About Project', icon: Info, badge: null },
 ];
