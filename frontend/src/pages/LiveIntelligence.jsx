@@ -1,3 +1,6 @@
+import ChargingMap from '../components/ChargingMap';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 import React, { useEffect, useRef, useState } from 'react';
 import {
   MapPin,
@@ -15,7 +18,6 @@ import {
   X,
 } from 'lucide-react';
 
-import ChargingMap from '../components/ChargingMap';
 
 const LiveIntelligence = () => {
   // ------------------------------------------------------------
@@ -934,9 +936,7 @@ const LiveIntelligence = () => {
         );
 
         try {
-          const response = await fetch(
-            `/api/live-intelligence/nearby-stations?latitude=${latitude}&longitude=${longitude}`
-          );
+          const response = await fetch(` ${API_BASE_URL}/live-intelligence/nearby-stations?latitude=${latitude}&longitude=${longitude}`);
 
           const data = await response.json();
           console.log("LIVE INTELLIGENCE RESPONSE:", data);
