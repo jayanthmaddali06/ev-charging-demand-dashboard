@@ -115,7 +115,7 @@ const AIIntelligence = () => {
   const [aiHealth, setAiHealth] = useState({
     connected: false,
     checked: false,
-    message: 'Checking Ollama connection…',
+    message: 'Checking Gemini connection…',
     dataContext: 'Unavailable'
   });
 
@@ -140,8 +140,8 @@ const AIIntelligence = () => {
         connected,
         checked: true,
         message: connected
-          ? 'Ollama is connected and ready.'
-          : 'AI engine is currently unavailable. Start Ollama and try again.',
+          ? 'Gemini is connected and ready.'
+          : 'AI engine is currently unavailable. Please try again.',
         dataContext: connected ? 'Available' : 'Unavailable'
       });
     } catch (err) {
@@ -149,7 +149,7 @@ const AIIntelligence = () => {
         connected: false,
         checked: true,
         message:
-          'AI engine is currently unavailable. Start Ollama and try again.',
+         'AI engine is currently unavailable. Please try again.',
         dataContext: 'Unavailable'
       });
     }
@@ -176,7 +176,7 @@ const AIIntelligence = () => {
 
     if (!aiHealth.connected) {
       setError(
-        'AI engine is currently unavailable. Start Ollama and try again.'
+        'AI engine is currently unavailable. Please try again.'
       );
       return;
     }
@@ -319,7 +319,7 @@ const AIIntelligence = () => {
                   : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
               }`}
             >
-              Ollama
+              Gemini
             </span>
 
           </div>
