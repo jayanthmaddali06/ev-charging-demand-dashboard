@@ -26,7 +26,7 @@ router.get('/nearby-stations', async (req, res) => {
       latitude,
       longitude,
       distanceKm: 5,
-      maxResults: 50,
+      maxResults: 10,
     });
 
     console.log('OCM STATIONS RETURNED:', stations.map(station => ({
