@@ -28,6 +28,14 @@ router.get('/nearby-stations', async (req, res) => {
       distanceKm: 5,
       maxResults: 50,
     });
+
+    console.log('OCM STATIONS RETURNED:', stations.map(station => ({
+  id: station.ID,
+  name: station.AddressInfo?.Title,
+  latitude: station.AddressInfo?.Latitude,
+  longitude: station.AddressInfo?.Longitude,
+})));
+
     const mlSummary = dataService.getSummary();
 const mlPredictions = dataService.getPredictions(1, 100);
 
