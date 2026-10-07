@@ -20,7 +20,7 @@ router.get('/nearby-stations', async (req, res) => {
     const stations = await getNearbyStations({
       latitude,
       longitude,
-      distanceKm: 25,
+      distanceKm: 5,
       maxResults: 50,
     });
     const mlSummary = dataService.getSummary();
