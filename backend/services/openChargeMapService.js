@@ -12,6 +12,16 @@ async function getNearbyStations({
   if (!OCM_API_KEY) {
     throw new Error('OCM API key is not configured');
   }
+    if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 ||
+    latitude > 90 ||
+    longitude < -180 ||
+    longitude > 180
+  ) {
+    throw new Error('Invalid latitude or longitude');
+  }
 
   const params = new URLSearchParams({
     output: 'json',

@@ -936,9 +936,12 @@ const LiveIntelligence = () => {
         );
 
         try {
-          const response = await fetch(` ${API_BASE_URL}/live-intelligence/nearby-stations?latitude=${latitude}&longitude=${longitude}`);
+          const response = await fetch(` 
+            ${API_BASE_URL}/live-intelligence/nearby-stations?latitude=${latitude}&longitude=${longitude}`
+          );
 
           const data = await response.json();
+          
           console.log("LIVE INTELLIGENCE RESPONSE:", data);
             console.log("CANDIDATE AREA:", data?.analysis?.candidateArea);
 
