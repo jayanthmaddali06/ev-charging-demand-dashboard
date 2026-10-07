@@ -10,7 +10,7 @@ router.get('/nearby-stations', async (req, res) => {
     const latitude = Number(req.query.latitude);
     const longitude = Number(req.query.longitude);
 
-     console.log('📍 LIVE GPS RECEIVED:', {
+    console.log("LIVE GPS RECEIVED:", {
       latitude,
       longitude
     });
@@ -22,6 +22,12 @@ router.get('/nearby-stations', async (req, res) => {
       });
     }
 
+    console.log("OCM SEARCH:", {
+      latitude,
+      longitude,
+      radiusKm: 5
+    });
+
     const stations = await getNearbyStations({
       latitude,
       longitude,
@@ -29,12 +35,13 @@ router.get('/nearby-stations', async (req, res) => {
       maxResults: 10,
     });
 
-    console.log('OCM STATIONS RETURNED:', stations.map(station => ({
-  id: station.ID,
-  name: station.AddressInfo?.Title,
-  latitude: station.AddressInfo?.Latitude,
-  longitude: station.AddressInfo?.Longitude,
-})));
+    console.log("NEAREST STATIONS:", stations.map(station => ({
+      id: station.ID,
+      name: station.AddressInfo?.Title,
+      latitude: station.AddressInfo?.Latitude,
+      longitude: station.AddressInfo?.Longitude,
+      distanceKm: station.distanceKm
+    })));
 
     const mlSummary = dataService.getSummary();
 const mlPredictions = dataService.getPredictions(1, 100);

@@ -50,9 +50,11 @@ function analyzeChargingGap(
       latitude: address.Latitude ?? null,
       longitude: address.Longitude ?? null,
       distanceKm:
-        typeof address.Distance === 'number'
-          ? address.Distance
-          : null,
+        typeof station.distanceKm === 'number'
+          ? station.distanceKm
+          : typeof address.Distance === 'number'
+            ? address.Distance
+            : null,
       connectionCount,
       isOperational: status,
     };

@@ -847,21 +847,18 @@ const LiveIntelligence = () => {
         positionError.PERMISSION_DENIED
       ) {
         setError(
-          'Location permission was denied.'
-        );
-      } else if (
-        positionError.code ===
-        positionError.POSITION_UNAVAILABLE
-      ) {
-        setError(
-          'Your current location is unavailable.'
+          'Location permission is required to find charging stations near you.'
         );
       } else if (
         positionError.code ===
         positionError.TIMEOUT
       ) {
         setError(
-          'Location request timed out.'
+          'Unable to get your current location. Please try again.'
+        );
+      } else {
+        setError(
+          'Unable to get your current location. Please try again.'
         );
       }
     };
@@ -900,7 +897,7 @@ const LiveIntelligence = () => {
       !navigator.geolocation
     ) {
       setError(
-        'Geolocation is not supported by this browser.'
+        'Your browser does not support live location.'
       );
 
       return;
@@ -936,15 +933,13 @@ const LiveIntelligence = () => {
         );
 
         try {
-          const response = await fetch(` 
-            ${API_BASE_URL}/live-intelligence/nearby-stations?latitude=${latitude}&longitude=${longitude}`
+          const cleanApiBase = (API_BASE_URL || '/api').replace(/\/+$/, '');
+          const response = await fetch(
+            `${cleanApiBase}/live-intelligence/nearby-stations?latitude=${latitude}&longitude=${longitude}`
           );
 
           const data = await response.json();
           
-          console.log("LIVE INTELLIGENCE RESPONSE:", data);
-            console.log("CANDIDATE AREA:", data?.analysis?.candidateArea);
-
           if (!response.ok || !data.success) {
             throw new Error(
               data.message ||
@@ -988,25 +983,18 @@ const LiveIntelligence = () => {
           positionError.PERMISSION_DENIED
         ) {
           setError(
-            'Location permission was denied. Please allow location access and try again.'
-          );
-        } else if (
-          positionError.code ===
-          positionError.POSITION_UNAVAILABLE
-        ) {
-          setError(
-            'Your current location could not be determined.'
+            'Location permission is required to find charging stations near you.'
           );
         } else if (
           positionError.code ===
           positionError.TIMEOUT
         ) {
           setError(
-            'Location request timed out. Please try again.'
+            'Unable to get your current location. Please try again.'
           );
         } else {
           setError(
-            'Unable to get your current location.'
+            'Unable to get your current location. Please try again.'
           );
         }
 
@@ -1424,6 +1412,20 @@ const LiveIntelligence = () => {
           NEARBY STATIONS
       ====================================================== */}
 
+      {coordinates && !loadingStations && stations.length === 0 && (
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 text-center">
+          <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto mb-3">
+            <MapPin className="w-6 h-6 text-slate-400" />
+          </div>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+            Nearby Charging Stations
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+            No Open Charge Map charging stations were found within 5 km of your current location.
+          </p>
+        </div>
+      )}
+
       {coordinates && stations.length > 0 && (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6">
 
@@ -1454,17 +1456,18 @@ const LiveIntelligence = () => {
 
               const stationName =
                 address.Title ||
-                'Charging Station';
+                'EV Charging Station';
 
               const stationAddress =
                 address.AddressLine1 ||
                 'Address unavailable';
 
               const stationDistance =
-                typeof address.Distance ===
-                'number'
-                  ? address.Distance
-                  : null;
+                typeof station.distanceKm === 'number'
+                  ? station.distanceKm
+                  : typeof address.Distance === 'number'
+                    ? address.Distance
+                    : null;
 
               const connectionCount =
                 Array.isArray(
@@ -1509,7 +1512,7 @@ const LiveIntelligence = () => {
                             {stationDistance.toFixed(
                               1
                             )}{' '}
-                            km
+                            km away
                           </span>
                         )}
 
@@ -1519,17 +1522,21 @@ const LiveIntelligence = () => {
                         </span>
 
                         {typeof operational ===
-                          'boolean' && (
+                          'boolean' ? (
                           <span
                             className={
                               operational
-                                ? 'text-green-600'
-                                : 'text-red-500'
+                                ? 'text-green-600 dark:text-green-400 font-medium'
+                                : 'text-red-500 dark:text-red-400 font-medium'
                             }
                           >
                             {operational
                               ? 'Operational'
                               : 'Not confirmed operational'}
+                          </span>
+                        ) : (
+                          <span className="text-slate-500 dark:text-slate-400">
+                            Status unavailable
                           </span>
                         )}
 

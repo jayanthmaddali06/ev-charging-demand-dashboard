@@ -343,10 +343,10 @@ const ChargingMap = ({
   }, [candidateArea]);
 
   // ----------------------------------------------------------
-  // SEARCH RADIUS
+  // SEARCH RADIUS (5 KM)
   // ----------------------------------------------------------
 
-  const searchRadius = 25000;
+  const searchRadius = 5000;
 
   // ----------------------------------------------------------
   // STATION MARKERS
@@ -541,7 +541,7 @@ const ChargingMap = ({
                 ?.IsOperational;
 
             const distance =
-              safeNumber(address.Distance);
+              safeNumber(station?.distanceKm ?? address.Distance);
 
             const connections =
               Array.isArray(
@@ -600,7 +600,7 @@ const ChargingMap = ({
                         }}
                       >
                         📍{' '}
-                        {distance.toFixed(1)} km
+                        {distance.toFixed(1)} km away
                       </div>
                     )}
 

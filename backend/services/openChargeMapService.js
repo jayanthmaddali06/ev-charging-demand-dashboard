@@ -71,6 +71,10 @@ async function getNearbyStations({
 
   const rawStations = await response.json();
 
+  if (!Array.isArray(rawStations)) {
+    return [];
+  }
+
   // Calculate exact distance from user's live GPS
   const stationsWithDistance = rawStations
     .filter((station) => {
@@ -90,9 +94,15 @@ async function getNearbyStations({
         stationLon
       );
 
+      const roundedDistance = Number(distance.toFixed(2));
+
       return {
         ...station,
-        distanceKm: Number(distance.toFixed(2)),
+        distanceKm: roundedDistance,
+        AddressInfo: {
+          ...station.AddressInfo,
+          Distance: roundedDistance,
+        },
       };
     })
     // Make absolutely sure the station is within our radius
@@ -102,20 +112,10 @@ async function getNearbyStations({
     // Only return the closest stations
     .slice(0, maxResults);
 
-  console.log(
-    'NEAREST STATIONS:',
-    stationsWithDistance.map((station) => ({
-      id: station.ID,
-      name: station.AddressInfo?.Title,
-      distanceKm: station.distanceKm,
-      latitude: station.AddressInfo?.Latitude,
-      longitude: station.AddressInfo?.Longitude,
-    }))
-  );
-
   return stationsWithDistance;
 }
 
 module.exports = {
   getNearbyStations,
+  calculateDistanceKm,
 };
