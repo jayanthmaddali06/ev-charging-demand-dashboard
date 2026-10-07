@@ -10,6 +10,11 @@ router.get('/nearby-stations', async (req, res) => {
     const latitude = Number(req.query.latitude);
     const longitude = Number(req.query.longitude);
 
+     console.log('📍 LIVE GPS RECEIVED:', {
+      latitude,
+      longitude
+    });
+
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
       return res.status(400).json({
         success: false,
