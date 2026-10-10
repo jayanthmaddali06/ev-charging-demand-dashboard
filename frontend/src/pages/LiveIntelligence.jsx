@@ -124,11 +124,18 @@ const LiveIntelligence = () => {
                 setSelectedStation(firstFour[0]);
               }
             } else {
-              setError('Live intelligence analysis is temporarily unavailable. Please check the ML service.');
+              const errMsg = analysisRes?.message || 'Live intelligence analysis failed on backend.';
+              console.warn('[LiveIntelligence] Analysis unsuccessful:', errMsg);
+              setError(`Live intelligence analysis unavailable: ${errMsg}`);
             }
           } catch (analyzeErr) {
-            console.error('[LiveIntelligence] /analyze request failed:', analyzeErr);
-            // Stations were discovered successfully by Places, but backend analysis failed
+            console.error('[LiveIntelligence] /analyze request failed:', {
+              status: analyzeErr?.response?.status,
+              message: analyzeErr?.message,
+              url: analyzeErr?.config?.url || '/live-intelligence/analyze'
+            });
+
+            // Keep discovered stations visible even if backend analysis fails
             const firstFour = discovered.slice(0, 4);
             const remaining = discovered.slice(4);
             setAllStations(discovered);
@@ -137,11 +144,21 @@ const LiveIntelligence = () => {
             if (firstFour.length > 0) {
               setSelectedStation(firstFour[0]);
             }
-            setError('Live intelligence analysis is temporarily unavailable. Please check the ML service.');
+
+            // Differentiate error accurately
+            if (!analyzeErr.response) {
+              setError('Backend service is unreachable. Please verify https://ev-charging-node-backend.onrender.com is deployed and active.');
+            } else if (analyzeErr.response.status === 404) {
+              setError('Live intelligence route not found on backend (404). Please ensure the latest backend deployment on Render is active.');
+            } else if (analyzeErr.response.status === 500) {
+              setError('Backend live intelligence analysis error (500). Please check the backend and ML service logs.');
+            } else {
+              setError(analyzeErr.message || 'Live intelligence analysis is temporarily unavailable.');
+            }
           }
         } catch (err) {
-          console.error('[LiveIntelligence] General error:', err);
-          setError(err.message || 'Live intelligence analysis is temporarily unavailable. Please check the ML service.');
+          console.error('[LiveIntelligence] General error:', err?.message || err);
+          setError(err.message || 'An unexpected error occurred during live intelligence processing.');
         } finally {
           setLoading(false);
         }
@@ -269,7 +286,9 @@ const LiveIntelligence = () => {
               <div>
                 <p className="text-sm font-semibold text-rose-900 dark:text-rose-200">{error}</p>
                 <p className="text-xs text-rose-600 dark:text-rose-400 mt-0.5">
-                  Please verify browser geolocation permissions or check your connection.
+                  {error.toLowerCase().includes('location') || error.toLowerCase().includes('permission')
+                    ? 'Please verify browser geolocation permissions or check your device GPS.'
+                    : 'Check your network connection or verify that the backend and ML services are online.'}
                 </p>
               </div>
             </div>
@@ -543,7 +562,7 @@ const LiveIntelligence = () => {
       {/* ────────────────────────────────────────────────────────── */}
       {/* 5. TEMPORAL DEMAND INTELLIGENCE                            */}
       {/* ────────────────────────────────────────────────────────── */}
-      {temporalContext && (
+      {coordinates && (
         <div className="rounded-3xl border border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 sm:p-7 shadow-sm">
           <div className="flex items-center gap-3 mb-5">
             <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 flex items-center justify-center">
@@ -559,37 +578,44 @@ const LiveIntelligence = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</span>
-              <p className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">{temporalContext.day_of_week || 'Unavailable'}</p>
+          {temporalContext ? (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Today</span>
+                <p className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">{temporalContext.day_of_week || 'Unavailable'}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Day Classification</span>
+                <p className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">{temporalContext.day_type || 'Unavailable'}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Current Period</span>
+                <p className="text-sm font-bold text-purple-600 dark:text-purple-400 mt-1.5">{temporalContext.period || 'Unavailable'}</p>
+              </div>
+              <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Predicted Demand</span>
+                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1.5">
+                  {demandSummary && demandSummary.available && demandSummary.predictedDemandKwh != null
+                    ? `${demandSummary.predictedDemandKwh} ${demandSummary.unit || 'kWh'}${demandSummary.demandLevel ? ` (${demandSummary.demandLevel})` : ''}`
+                    : 'Unavailable'}
+                </p>
+              </div>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Day Classification</span>
-              <p className="text-sm font-bold text-slate-900 dark:text-white mt-1.5">{temporalContext.day_type || 'Unavailable'}</p>
+          ) : (
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60 text-sm text-slate-500 dark:text-slate-400">
+              <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <span>Temporal demand prediction temporarily unavailable. Please ensure the ML service is running and try refreshing.</span>
             </div>
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Current Period</span>
-              <p className="text-sm font-bold text-purple-600 dark:text-purple-400 mt-1.5">{temporalContext.period || 'Unavailable'}</p>
-            </div>
-            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Predicted Demand</span>
-              <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-1.5">
-                {demandSummary && demandSummary.predictedDemandKwh != null
-                  ? `${demandSummary.predictedDemandKwh} ${demandSummary.unit || 'kWh'}${demandSummary.demandLevel ? ` (${demandSummary.demandLevel})` : ''}`
-                  : 'Unavailable'}
-              </p>
-            </div>
-          </div>
+          )}
         </div>
       )}
 
       {/* ────────────────────────────────────────────────────────── */}
       {/* 6. SUGGESTED NEW EV CHARGING STATION LOCATION              */}
       {/* ────────────────────────────────────────────────────────── */}
-      {proposedStation && (
+      {coordinates && (
         <div className="rounded-3xl border-2 border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-amber-500/10 dark:from-amber-950/20 dark:to-slate-900 p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-2">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white font-bold">
                 ⚡
@@ -603,54 +629,65 @@ const LiveIntelligence = () => {
                 </h3>
               </div>
             </div>
-            <div className="px-4 py-2 rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300 font-extrabold text-sm text-center">
-              Charging Gap Score: {proposedStation.score != null ? `${proposedStation.score}/100` : 'Unavailable'}
-            </div>
+            {proposedStation && (
+              <div className="px-4 py-2 rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300 font-extrabold text-sm text-center">
+                Charging Gap Score: {proposedStation.score != null ? `${proposedStation.score}/100` : 'Unavailable'}
+              </div>
+            )}
           </div>
 
-          <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/20">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Distance From You</span>
-              <p className="text-base font-bold text-slate-900 dark:text-white mt-1">
-                {proposedStation.distanceFromUserKm != null
-                  ? `~${proposedStation.distanceFromUserKm} km`
-                  : 'Unavailable'}
-              </p>
-            </div>
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/20">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gap Priority Level</span>
-              <p className="text-base font-bold text-amber-600 dark:text-amber-400 mt-1 capitalize">
-                {proposedStation.level
-                  ? `${proposedStation.level.charAt(0).toUpperCase() + proposedStation.level.slice(1).toLowerCase()} Priority`
-                  : 'Unavailable'}
-              </p>
-            </div>
-            <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/20">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Urban / Area Profile</span>
-              <p className="text-base font-bold text-slate-900 dark:text-white mt-1">
-                {proposedStation.locationType || 'Unavailable'}
-              </p>
-            </div>
-          </div>
+          {proposedStation ? (
+            <>
+              <div className="mt-5 grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/20">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Distance From You</span>
+                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1">
+                    {proposedStation.distanceFromUserKm != null
+                      ? `~${proposedStation.distanceFromUserKm} km`
+                      : 'Unavailable'}
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/20">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gap Priority Level</span>
+                  <p className="text-base font-bold text-amber-600 dark:text-amber-400 mt-1 capitalize">
+                    {proposedStation.level
+                      ? `${proposedStation.level.charAt(0).toUpperCase() + proposedStation.level.slice(1).toLowerCase()} Priority`
+                      : 'Unavailable'}
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900/80 border border-amber-500/20">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Urban / Area Profile</span>
+                  <p className="text-base font-bold text-slate-900 dark:text-white mt-1">
+                    {proposedStation.locationType || 'Unavailable'}
+                  </p>
+                </div>
+              </div>
 
-          {/* Rationale List */}
-          <div className="mt-5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-              WHY THIS LOCATION?
-            </h4>
-            <ul className="mt-2 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
-              {proposedStation.reasons?.map((reason, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="text-amber-500 font-bold">•</span>
-                  <span>{reason}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+              {/* Rationale List */}
+              <div className="mt-5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                  WHY THIS LOCATION?
+                </h4>
+                <ul className="mt-2 space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+                  {proposedStation.reasons?.map((reason, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-amber-500 font-bold">•</span>
+                      <span>{reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          <div className="mt-4 pt-4 border-t border-amber-500/20 text-[11px] text-amber-700/80 dark:text-amber-400/80 italic">
-            This is a decision-support suggestion, not a guaranteed construction recommendation.
-          </div>
+              <div className="mt-4 pt-4 border-t border-amber-500/20 text-[11px] text-amber-700/80 dark:text-amber-400/80 italic">
+                This is a decision-support suggestion, not a guaranteed construction recommendation.
+              </div>
+            </>
+          ) : (
+            <div className="flex items-center gap-3 mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-sm text-slate-500 dark:text-slate-400">
+              <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <span>Station location recommendation temporarily unavailable. Please ensure the ML service is running and try refreshing.</span>
+            </div>
+          )}
         </div>
       )}
     </div>
