@@ -49,21 +49,17 @@ const userIcon = L.divIcon({
   iconAnchor: [11, 11],
 });
 
-// ------------------------------------------------------------
-// SELECTED STATION ICON
-// ------------------------------------------------------------
-
-const selectedStationIcon = L.divIcon({
-  className: 'ev-selected-station-marker',
+const recommendedStationIcon = L.divIcon({
+  className: 'ev-recommended-station-marker',
   html: `
     <div
       style="
-        width: 28px;
-        height: 28px;
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        background: #16a34a;
-        border: 4px solid white;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+        background: #10b981;
+        border: 3.5px solid white;
+        box-shadow: 0 2px 10px rgba(16,185,129,0.5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -72,11 +68,55 @@ const selectedStationIcon = L.divIcon({
         font-weight: bold;
       "
     >
+      ★
+    </div>
+  `,
+  iconSize: [30, 30],
+  iconAnchor: [15, 15],
+});
+
+const nearbyStationIcon = L.divIcon({
+  className: 'ev-nearby-station-marker',
+  html: `
+    <div
+      style="
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #ef4444;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(239,68,68,0.4);
+      "
+    ></div>
+  `,
+  iconSize: [22, 22],
+  iconAnchor: [11, 11],
+});
+
+const selectedStationIcon = L.divIcon({
+  className: 'ev-selected-station-marker',
+  html: `
+    <div
+      style="
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #16a34a;
+        border: 4px solid white;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+      "
+    >
       ⚡
     </div>
   `,
-  iconSize: [28, 28],
-  iconAnchor: [14, 14],
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
 });
 
 // ------------------------------------------------------------
@@ -276,6 +316,7 @@ const safeNumber = (value) => {
 const ChargingMap = ({
   coordinates = null,
   stations = [],
+  recommendedStations = [],
   selectedStation = null,
   route = null,
   navigationActive = false,
@@ -550,6 +591,9 @@ const ChargingMap = ({
                 ? station.Connections.length
                 : 0;
 
+            const isRecommended =
+              recommendedStations.some(rs => rs.ID === station.ID);
+
             return (
               <Marker
                 key={
@@ -563,7 +607,9 @@ const ChargingMap = ({
                 icon={
                   isSelected
                     ? selectedStationIcon
-                    : L.Icon.Default.prototype
+                    : isRecommended
+                      ? recommendedStationIcon
+                      : nearbyStationIcon
                 }
               >
                 <Popup>
@@ -793,27 +839,47 @@ const ChargingMap = ({
               background: '#2563eb',
             }}
           />
-          <span>Your Location</span>
+          <span>● You (Live GPS)</span>
         </div>
 
         <div className="flex items-center gap-2 mb-1.5">
           <span
             className="w-3 h-3 rounded-full"
             style={{
-              background: '#16a34a',
+              background: '#10b981',
             }}
           />
-          <span>Selected Station</span>
+          <span>● Recommended Station</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 mb-1.5">
+          <span
+            className="w-3 h-3 rounded-full"
+            style={{
+              background: '#ef4444',
+            }}
+          />
+          <span>● Nearby Stations</span>
+        </div>
+
+        <div className="flex items-center gap-2 mb-1.5">
           <span
             className="w-3 h-3 rounded-full"
             style={{
               background: '#f59e0b',
             }}
           />
-          <span>Potential New Station Area</span>
+          <span>● Proposed New Station</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span
+            className="w-4 h-0.5 rounded"
+            style={{
+              background: '#2563eb',
+            }}
+          />
+          <span>━━ Route</span>
         </div>
       </div>
 

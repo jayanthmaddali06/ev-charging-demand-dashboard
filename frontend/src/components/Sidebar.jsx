@@ -20,12 +20,7 @@ import {
 const navItems = [
   { id: 'overview', label: 'Dashboard', icon: LayoutDashboard, badge: null },
   { id: 'prediction', label: 'Prediction', icon: Zap, badge: 'Live ML' },
-  { id: 'timeseries', label: 'Time Series', icon: TrendingUp, badge: null },
-  { id: 'clustering', label: 'Clustering', icon: Network, badge: '4 Clusters' },
-  { id: 'anomalies', label: 'Anomaly Detection', icon: AlertTriangle, badge: 'Isolation' },
-  { id: 'performance', label: 'Model Performance', icon: Cpu, badge: 'R² 0.98' },
-  { id: 'results', label: 'Prediction Results', icon: Table2, badge: null },
-   { id: 'ai-intelligence', label: 'AI Intelligence', icon: Sparkles, badge: 'AI' },
+  { id: 'ai-intelligence', label: 'AI Intelligence', icon: Sparkles, badge: 'AI' },
   { id: 'live-intelligence', label: 'Live Intelligence', icon: MapPinned, badge: 'Live' },
   { id: 'profile', label: 'My Profile', icon: UserCircle, badge: null },
   { id: 'about', label: 'About Project', icon: Info, badge: null },
@@ -51,7 +46,7 @@ const Sidebar = ({ activePage, setActivePage, isSidebarOpen, setIsSidebarOpen, i
       <aside
         className={`fixed top-0 bottom-0 left-0 z-50 flex flex-col bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/80 transition-all duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } ${isCollapsed ? 'lg:w-20' : 'lg:w-64'} w-64`}
+        } ${isCollapsed ? 'lg:w-20' : 'lg:w-72'} w-72`}
       >
         {/* Brand Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200/80 dark:border-slate-800/80">

@@ -33,7 +33,7 @@ import KPICard from '../components/KPICard';
 import { DashboardSkeleton, TableSkeleton } from '../components/LoadingSkeleton';
 import { api } from '../services/api';
 
-const AnomalyDetection = () => {
+const AnomalyDetection = ({ isEmbedded = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -111,12 +111,29 @@ const AnomalyDetection = () => {
   });
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Anomaly Detection"
-        subtitle="Isolation Forest ML telemetry screening to identify irregular charging sessions, station overload spikes, and queue bottlenecks."
-        badge="Isolation Forest Model"
-      />
+    <div className="space-y-8" id="section-anomalies">
+      {!isEmbedded ? (
+        <PageHeader
+          title="Anomaly Detection"
+          subtitle="Isolation Forest ML telemetry screening to identify irregular charging sessions, station overload spikes, and queue bottlenecks."
+          badge="Isolation Forest Model"
+        />
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-500 border border-rose-500/20 mb-2">
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Section 3 • Isolation Forest</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+              Anomaly Detection
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Isolation Forest screening detecting unusual demand spikes, queue bottlenecks, and outlier sessions.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

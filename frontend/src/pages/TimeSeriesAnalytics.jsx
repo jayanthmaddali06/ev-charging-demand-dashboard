@@ -29,7 +29,7 @@ import KPICard from '../components/KPICard';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import { api } from '../services/api';
 
-const TimeSeriesAnalytics = () => {
+const TimeSeriesAnalytics = ({ isEmbedded = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -72,17 +72,60 @@ const TimeSeriesAnalytics = () => {
   const { dailySeries = [], hourlyProfile = [], weeklyProfile = [], insights = {} } = data || {};
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Time-Series Analytics"
-        subtitle="Temporal decomposition of electric vehicle charging demand, 7-day rolling trends, and diurnal hourly profiles."
-        badge="Temporal Intelligence"
-        actionButton={
-          <div className="flex bg-slate-800/80 p-1 rounded-2xl border border-slate-700">
+    <div className="space-y-8" id="section-timeseries">
+      {!isEmbedded ? (
+        <PageHeader
+          title="Time-Series Analytics"
+          subtitle="Temporal decomposition of electric vehicle charging demand, 7-day rolling trends, and diurnal hourly profiles."
+          badge="Temporal Intelligence"
+          actionButton={
+            <div className="flex bg-slate-800/80 p-1 rounded-2xl border border-slate-700">
+              <button
+                onClick={() => setViewMode('daily')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  viewMode === 'daily' ? 'bg-emerald-500 text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                88-Day Horizon
+              </button>
+              <button
+                onClick={() => setViewMode('hourly')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  viewMode === 'hourly' ? 'bg-emerald-500 text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Hourly Profile
+              </button>
+              <button
+                onClick={() => setViewMode('weekly')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                  viewMode === 'weekly' ? 'bg-emerald-500 text-white shadow' : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                Weekly Pattern
+              </button>
+            </div>
+          }
+        />
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 mb-2">
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>Section 1 • Temporal Analytics</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+              Time Series Analytics
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              88-day charging demand horizon, rolling averages, and diurnal peak profiles.
+            </p>
+          </div>
+          <div className="flex bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-700 self-start sm:self-center">
             <button
               onClick={() => setViewMode('daily')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                viewMode === 'daily' ? 'bg-emerald-500 text-white shadow' : 'text-slate-400 hover:text-white'
+                viewMode === 'daily' ? 'bg-emerald-500 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               88-Day Horizon
@@ -90,22 +133,22 @@ const TimeSeriesAnalytics = () => {
             <button
               onClick={() => setViewMode('hourly')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                viewMode === 'hourly' ? 'bg-emerald-500 text-white shadow' : 'text-slate-400 hover:text-white'
+                viewMode === 'hourly' ? 'bg-emerald-500 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              Hourly Diurnal
+              Hourly Profile
             </button>
             <button
               onClick={() => setViewMode('weekly')}
               className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
-                viewMode === 'weekly' ? 'bg-emerald-500 text-white shadow' : 'text-slate-400 hover:text-white'
+                viewMode === 'weekly' ? 'bg-emerald-500 text-white shadow' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
-              Day of Week
+              Weekly Pattern
             </button>
           </div>
-        }
-      />
+        </div>
+      )}
 
       {/* KPI Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

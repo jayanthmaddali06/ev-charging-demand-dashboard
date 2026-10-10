@@ -28,7 +28,7 @@ import KPICard from '../components/KPICard';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import { api } from '../services/api';
 
-const ModelPerformance = () => {
+const ModelPerformance = ({ isEmbedded = false }) => {
   const [evalData, setEvalData] = useState(null);
   const [predictionsData, setPredictionsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -91,12 +91,29 @@ const ModelPerformance = () => {
   const actualVsPredSample = predictionsData?.chartSample || [];
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Model Performance & Evaluation"
-        subtitle="Empirical evaluation benchmarks across 1,671 held-out test records comparing Linear Regression vs Random Forest."
-        badge="Supervised Regression Benchmark"
-      />
+    <div className="space-y-8" id="section-performance">
+      {!isEmbedded ? (
+        <PageHeader
+          title="Model Performance & Evaluation"
+          subtitle="Empirical evaluation benchmarks across 1,671 held-out test records comparing Linear Regression vs Random Forest."
+          badge="Supervised Regression Benchmark"
+        />
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-violet-500/10 text-violet-500 border border-violet-500/20 mb-2">
+              <Cpu className="w-3.5 h-3.5" />
+              <span>Section 4 • Supervised Evaluation</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+              Model Performance
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Empirical regression validation across 1,671 held-out test records (R² = 0.9888).
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Attribution Banner */}
       <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-3">

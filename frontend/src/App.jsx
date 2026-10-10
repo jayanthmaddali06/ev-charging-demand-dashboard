@@ -61,7 +61,7 @@ function MainLayout({ activePage, setActivePage }) {
         setIsCollapsed={setIsCollapsed}
       />
 
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-64'}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${isCollapsed ? 'lg:pl-20' : 'lg:pl-72'}`}>
         <Navbar
           activePage={activePage}
           setActivePage={setActivePage}

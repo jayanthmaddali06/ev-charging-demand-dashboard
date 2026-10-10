@@ -20,6 +20,13 @@ import PageHeader from '../components/PageHeader';
 import { DashboardSkeleton } from '../components/LoadingSkeleton';
 import { api } from '../services/api';
 
+// Five analytics modules rendered continuously on the Dashboard
+import TimeSeriesAnalytics from './TimeSeriesAnalytics';
+import ClusterAnalysis from './ClusterAnalysis';
+import AnomalyDetection from './AnomalyDetection';
+import ModelPerformance from './ModelPerformance';
+import PredictionResults from './PredictionResults';
+
 const COLORS = ['#10b981', '#06b6d4', '#f59e0b', '#8b5cf6', '#ec4899'];
 
 const OverviewDashboard = ({ setActivePage }) => {
@@ -232,7 +239,10 @@ const OverviewDashboard = ({ setActivePage }) => {
         className="grid grid-cols-1 md:grid-cols-3 gap-4"
       >
         <div 
-          onClick={() => setActivePage('timeseries')}
+          onClick={() => {
+            const el = document.getElementById('section-timeseries');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
           className="cursor-pointer group p-5 rounded-2xl glass-panel hover:border-emerald-500/50 transition-all shadow-sm hover:shadow-lg flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
@@ -244,7 +254,7 @@ const OverviewDashboard = ({ setActivePage }) => {
                 Time-Series Trends
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                88 days of charging demand & rolling averages
+                Scroll to Section 1 • 88 days horizon
               </p>
             </div>
           </div>
@@ -252,7 +262,10 @@ const OverviewDashboard = ({ setActivePage }) => {
         </div>
 
         <div 
-          onClick={() => setActivePage('clustering')}
+          onClick={() => {
+            const el = document.getElementById('section-clustering');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
           className="cursor-pointer group p-5 rounded-2xl glass-panel hover:border-cyan-500/50 transition-all shadow-sm hover:shadow-lg flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
@@ -264,7 +277,7 @@ const OverviewDashboard = ({ setActivePage }) => {
                 K-Means Clusters
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                4 distinct charging behavioral patterns
+                Scroll to Section 2 • 4 clusters
               </p>
             </div>
           </div>
@@ -272,7 +285,10 @@ const OverviewDashboard = ({ setActivePage }) => {
         </div>
 
         <div 
-          onClick={() => setActivePage('performance')}
+          onClick={() => {
+            const el = document.getElementById('section-performance');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
           className="cursor-pointer group p-5 rounded-2xl glass-panel hover:border-violet-500/50 transition-all shadow-sm hover:shadow-lg flex items-center justify-between"
         >
           <div className="flex items-center gap-4">
@@ -284,13 +300,42 @@ const OverviewDashboard = ({ setActivePage }) => {
                 Model Evaluation
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Random Forest vs Linear Regression R² = 0.9888
+                Scroll to Section 4 • R² = 0.9888
               </p>
             </div>
           </div>
           <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-violet-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
         </div>
       </motion.div>
+
+      {/* ============================================================== */}
+      {/* FIVE CONTINUOUS VERTICAL ANALYTICS SECTIONS                     */}
+      {/* ============================================================== */}
+      
+      {/* SECTION 1: Time Series */}
+      <section className="pt-6 border-t-2 border-dashed border-slate-200 dark:border-slate-800">
+        <TimeSeriesAnalytics isEmbedded={true} />
+      </section>
+
+      {/* SECTION 2: Clustering */}
+      <section className="pt-10 border-t-2 border-dashed border-slate-200 dark:border-slate-800">
+        <ClusterAnalysis isEmbedded={true} />
+      </section>
+
+      {/* SECTION 3: Anomaly Detection */}
+      <section className="pt-10 border-t-2 border-dashed border-slate-200 dark:border-slate-800">
+        <AnomalyDetection isEmbedded={true} />
+      </section>
+
+      {/* SECTION 4: Model Performance */}
+      <section className="pt-10 border-t-2 border-dashed border-slate-200 dark:border-slate-800">
+        <ModelPerformance isEmbedded={true} />
+      </section>
+
+      {/* SECTION 5: Prediction Results */}
+      <section className="pt-10 border-t-2 border-dashed border-slate-200 dark:border-slate-800">
+        <PredictionResults isEmbedded={true} />
+      </section>
     </div>
   );
 };

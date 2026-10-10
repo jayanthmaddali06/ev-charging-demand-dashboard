@@ -39,7 +39,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json({ limit: '10kb' })); // Limit payload size
+app.use(express.json({ limit: '2mb' })); // Support Google Places station payloads
+app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
 // Request logging in development
 app.use((req, res, next) => {
@@ -94,10 +95,16 @@ app.use((req, res) => {
 
 // Global error handler
 app.use((err, req, res, next) => {
-  console.error('[Server Error]', err);
-  res.status(500).json({
+  console.error('[Server Error]', err.type || err.name, err.message, err.stack);
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({
+      success: false,
+      message: 'Request payload too large. Please reduce batch size.'
+    });
+  }
+  res.status(err.status || 500).json({
     success: false,
-    message: 'Internal server error',
+    message: err.message || 'Internal server error',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });

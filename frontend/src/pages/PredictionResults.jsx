@@ -29,7 +29,7 @@ import ChartCard from '../components/ChartCard';
 import { TableSkeleton } from '../components/LoadingSkeleton';
 import { api } from '../services/api';
 
-const PredictionResults = () => {
+const PredictionResults = ({ isEmbedded = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -85,12 +85,29 @@ const PredictionResults = () => {
   });
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="Prediction Results & Telemetry"
-        subtitle="Granular evaluation dataset comparing ground truth test records against machine learning inferences."
-        badge="1,671 Evaluation Samples"
-      />
+    <div className="space-y-8" id="section-results">
+      {!isEmbedded ? (
+        <PageHeader
+          title="Prediction Results & Telemetry"
+          subtitle="Granular evaluation dataset comparing ground truth test records against machine learning inferences."
+          badge="1,671 Evaluation Samples"
+        />
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-500 border border-amber-500/20 mb-2">
+              <Table2 className="w-3.5 h-3.5" />
+              <span>Section 5 • Prediction Telemetry</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+              Prediction Results & Telemetry
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              Granular telemetry records comparing ground truth against Random Forest & Linear Regression.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Chart Section */}
       <ChartCard

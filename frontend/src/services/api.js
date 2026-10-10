@@ -58,7 +58,36 @@ export const api = {
     apiClient.get('/ai/health'),
 
   sendAiChat: (payload) =>
-    apiClient.post('/ai/chat', payload)
+    apiClient.post('/ai/chat', payload),
+
+  // Live Intelligence APIs
+  getLiveIntelligenceAnalysis: (latitude, longitude, stations = null) => {
+    if (stations && Array.isArray(stations) && stations.length > 0) {
+      return apiClient.post('/live-intelligence/analyze', { latitude, longitude, stations });
+    }
+    return apiClient.get('/live-intelligence/analyze', { params: { latitude, longitude } });
+  },
+
+  getNearbyStations: (latitude, longitude, stations = null) => {
+    if (stations && Array.isArray(stations) && stations.length > 0) {
+      return apiClient.post('/live-intelligence/nearby-stations', { latitude, longitude, stations });
+    }
+    return apiClient.get('/live-intelligence/nearby-stations', { params: { latitude, longitude } });
+  },
+
+  getLiveRecommendations: (latitude, longitude, stations = null) => {
+    if (stations && Array.isArray(stations) && stations.length > 0) {
+      return apiClient.post('/live-intelligence/recommendations', { latitude, longitude, stations });
+    }
+    return apiClient.get('/live-intelligence/recommendations', { params: { latitude, longitude } });
+  },
+
+  getProposedNewStation: (latitude, longitude, stations = null) => {
+    if (stations && Array.isArray(stations) && stations.length > 0) {
+      return apiClient.post('/live-intelligence/new-station', { latitude, longitude, stations });
+    }
+    return apiClient.get('/live-intelligence/new-station', { params: { latitude, longitude } });
+  }
 };
 
 export default api;

@@ -33,7 +33,7 @@ import { api } from '../services/api';
 
 const CLUSTER_COLORS = ['#10b981', '#06b6d4', '#f59e0b', '#8b5cf6'];
 
-const ClusterAnalysis = () => {
+const ClusterAnalysis = ({ isEmbedded = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,12 +89,29 @@ const ClusterAnalysis = () => {
   }));
 
   return (
-    <div className="space-y-8">
-      <PageHeader
-        title="K-Means Cluster Analysis"
-        subtitle="Unsupervised machine learning segmentation of charging sessions into distinct behavioral patterns."
-        badge="Unsupervised Clustering"
-      />
+    <div className="space-y-8" id="section-clustering">
+      {!isEmbedded ? (
+        <PageHeader
+          title="K-Means Cluster Analysis"
+          subtitle="Unsupervised machine learning segmentation of charging sessions into distinct behavioral patterns."
+          badge="Unsupervised Clustering"
+        />
+      ) : (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-200/80 dark:border-slate-800/80">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 mb-2">
+              <Network className="w-3.5 h-3.5" />
+              <span>Section 2 • Unsupervised ML</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+              Clustering Analysis
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+              K-Means segmentation discovering 4 distinct consumer charging archetypes.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Cluster Overview Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
