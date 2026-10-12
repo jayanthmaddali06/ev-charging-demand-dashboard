@@ -15,67 +15,35 @@ const Navbar = ({ activePage, setActivePage, isSidebarOpen, setIsSidebarOpen }) 
 
   // ── ML health polling ──────────────────────────────────────────────────────
   useEffect(() => {
-    let isMounted = true;
-    let attempts = 0;
-    let timeoutId;
+  let isMounted = true;
 
-    const MAX_ATTEMPTS = 18; // 18 × 5 seconds = 90 seconds
-    const RETRY_DELAY = 5000; // retry every 5 seconds
+  const check = async () => {
+    try {
+      const res = await api.getHealth();
 
-    const check = async () => {
-      if (!isMounted) return;
-
-      try {
-        const res = await api.getHealth();
-
-        if (!isMounted) return;
-
-        const isHealthy = res?.services?.mlService === 'healthy';
-
-        if (isHealthy) {
-          setMlStatus('online');
-          attempts = 0;
-
-          // Continue checking periodically after becoming online
-          timeoutId = setTimeout(check, 15000);
-          return;
-        }
-
-        // ML service may still be waking up
-        attempts += 1;
-
-        if (attempts < MAX_ATTEMPTS) {
-          setMlStatus('checking');
-          timeoutId = setTimeout(check, RETRY_DELAY);
-        } else {
-          setMlStatus('offline');
-        }
-
-      } catch (error) {
-        if (!isMounted) return;
-
-        attempts += 1;
-
-        // Don't immediately show Offline.
-        // Render Free may need time to wake the ML service.
-        if (attempts < MAX_ATTEMPTS) {
-          setMlStatus('checking');
-          timeoutId = setTimeout(check, RETRY_DELAY);
-        } else {
-          setMlStatus('offline');
-        }
+      if (isMounted) {
+        setMlStatus(
+          res?.services?.mlService === 'healthy'
+            ? 'online'
+            : 'offline'
+        );
       }
-    };
+    } catch {
+      if (isMounted) {
+        setMlStatus('offline');
+      }
+    }
+  };
 
-    // Start checking when Navbar loads
-    setMlStatus('checking');
-    check();
+  check();
 
-    return () => {
-      isMounted = false;
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, []);
+  const id = setInterval(check, 15000);
+
+  return () => {
+    isMounted = false;
+    clearInterval(id);
+  };
+}, []);
 
   // ── Close profile menu on outside click ───────────────────────────────────
   useEffect(() => {
